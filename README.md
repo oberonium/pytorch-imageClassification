@@ -1,12 +1,12 @@
 # pytorch-imageClassification 
 
-### 1. update log
+### 1. Update log
 - basic version (support resnet-18 and ImageFolder datasets)
 
 ### 2. Usages
 
 
-### 3. support functions 
+### 3. Support functions 
 - [x] pytorch model(from torchvision)
   
-### 4.TODO
+### 4. TODO
