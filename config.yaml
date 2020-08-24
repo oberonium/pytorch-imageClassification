@@ -1,0 +1,42 @@
+#************************************************************#
+# FileName      : config.yaml
+# Objective     : config file
+# Created by    :
+# Created on    : 08/23/2020
+# Last modified : 08/23/2020 10:33
+# Description   :
+#   V1.0
+#************************************************************#
+### for evaluation:
+best_model : "20200416-res18-data4000-111.pth"
+
+### for training
+# Datasets
+train_data : "./images/train"
+test_data : "./images/test2"
+val_data : "./images/valid"
+
+# models
+model_name : "resnet18"
+weights : "./checkpoints/"
+best_model_dir : "best_model/"
+submit : "./submit/"
+logs : "./logs/"
+
+# hyper-parameters
+epochs : 10
+batch_size : 1
+img_height : 1024
+img_weight : 1024
+num_classes : 2
+seed : 888
+
+# optimiser-parameters
+optimiser : "Adam"
+lr : 1e-3
+lr_decay : 0.9
+lr_decay_step : 2
+lr_weight_decay : 0.0005
+
+# hardware
+gpus : "1"
