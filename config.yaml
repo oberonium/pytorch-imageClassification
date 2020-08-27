@@ -3,12 +3,13 @@
 # Objective     : config file
 # Created by    :
 # Created on    : 08/23/2020
-# Last modified : 08/23/2020 10:33
+# Last modified : 08/27/2020 16:11
 # Description   :
-#   V1.0
+#   V1.1 parameters for evaluation
+#   V1.0 basic function for training
 #************************************************************#
 ### for evaluation:
-best_model : "20200416-res18-data4000-111.pth"
+check_model : "./checkpoints/check_model/"
 
 ### for training
 # Datasets
@@ -39,4 +40,4 @@ lr_decay_step : 2
 lr_weight_decay : 0.0005
 
 # hardware
-gpus : "1"
+gpus : "cpu"
