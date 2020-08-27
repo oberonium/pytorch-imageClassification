@@ -4,7 +4,7 @@
 # Objective     : get configurations for train or inference
 # Created by    :
 # Created on    : 08/20/2020
-# Last modified : 08/20/2020 15:05:09
+# Last modified : 08/27/2020 16:06
 # Description   :
 #   V1.0 basic function
 # ************************************************************#
@@ -24,8 +24,8 @@ class DefaultConfigs(object):
 
         # models
         self.model_name = "resnet-18"
-        self.records = "../checkpoints/"
-        self.best_model = self.records + "bestModel.pth"
+        self.records = "./checkpoints/"
+        self.best_model = self.records + "bestModel"
         self.checkpoint = self.records + "checkpoint"
         self.logs = "./log.txt"
 
@@ -48,10 +48,16 @@ class DefaultConfigs(object):
         with open(yaml_path, 'rb') as f:
             params = yaml.load(f, Loader = yaml.FullLoader)
 
-        self.train_data = params['train_data']
-        self.test_data = params['lr_weight_decay']
-        self.val_data = params['lr_weight_decay']
-
+        self.gpus = params["gpus"]
+        if mode == "train":
+            self.train_data = params['train_data']
+            self.test_data = params['test_data']
+            self.val_data = params['val_data']
+            print("training mode")
+        elif mode == "eval":
+            self.test_data = params['test_data']
+            self.checkmodel = params['check_model']
+            print("evaluation mode")
         # models
         self.model_name = params['model_name']
 
