@@ -4,7 +4,7 @@
 # Objective     : get configurations for train or inference
 # Created by    :
 # Created on    : 08/20/2020
-# Last modified : 08/27/2020 16:06
+# Last modified : 09/01/2020 13:36
 # Description   :
 #   V1.0 basic function
 # ************************************************************#
@@ -50,9 +50,13 @@ class DefaultConfigs(object):
 
         self.gpus = params["gpus"]
         if mode == "train":
+            self.resume = params['resume']
             self.train_data = params['train_data']
             self.test_data = params['test_data']
             self.val_data = params['val_data']
+
+            self.epochs = params['epochs']
+            self.batch_size = params['batch_size']
             print("training mode")
         elif mode == "eval":
             self.test_data = params['test_data']
