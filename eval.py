@@ -7,6 +7,7 @@
 # Last modified : 08/31/2020 17:19
 # Description   :
 #   V1.1 add confusion matrix; F1 score; precision
+#        fixed gpu training model load into gpu/cpu bug
 #   V1.0 basic function
 # ************************************************************#
 
@@ -86,8 +87,10 @@ print(f'Network: {para.model_name}')
 print("!########################################!")
 for models in os.listdir(MODEL_PATH):
     if models[-4:] == ".pth":
-        backbone_model.model.load_state_dict(torch.load(os.path.join(MODEL_PATH, models), map_location = para.gpus))
-
+        if device == "cpu":
+            backbone_model.model.load_state_dict(torch.load(os.path.join(MODEL_PATH, models), map_location = para.gpus))
+        else:
+            backbone_model.model.load_state_dict(torch.load(os.path.join(MODEL_PATH, models)))
         pred_list, true_list = evaluate(backbone_model.model, device, NP.test_iterator)
         cm = confusion_matrix(true_list, pred_list)
         eval_acc = accuracy_score(true_list, pred_list)
