@@ -1,4 +1,20 @@
+# -*- coding: utf-8 -*-
+# ************************************************************#
+# FileName      : train.py
+# Objective     : define training
+# Created by    :
+# Created on    : 08/25/2020
+# Last modified : 09/01/2020 13:36
+# Description   :
+#   V1.1: add save checkpoint; resume training from checkpoint
+#   V1.0: define training process
+# ************************************************************#
 
+
+from data import datasets
+from config import config
+from models import default_model
+from utils import logger
 
 import torch
 import torch.nn as nn
@@ -41,7 +57,6 @@ def train(model, device, iterator, optimizer, criterion):
 
         epoch_loss += loss.item()
         epoch_acc += acc.item()
-        print(loss.item())
     return epoch_loss / len(iterator), epoch_acc / len(iterator)
 
 
@@ -74,25 +89,25 @@ torch.backends.cudnn.deterministic = True
 
 para = config.DefaultConfigs()
 
-if os.path.exists("config/config.yaml"):
-    para.parse("config/config.yaml")
+if os.path.exists("config.yaml"):
+    para.parse("config.yaml")
 
 if not os.path.exists(para.records):
     os.makedirs(para.records)
-sys.stdout = logger.Logger(para.records+datetime.strftime(start, '%Y%m%d')+'-'+para.model_name+'.log')
+sys.stdout = logger.Logger(para.records + datetime.strftime(start, '%Y%m%d') + '-' + para.model_name + '.log')
 
-device = torch.device("cuda:0" if torch.cuda.is_available() and para.gpus !="cpu"  else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() and para.gpus != "cpu" else "cpu")
 EPOCHS = para.epochs
 SAVE_DIR = para.records
-CHECKPOINT = para.checkpoint
+CHECKPOINT_PATH = para.checkpoint + datetime.strftime(start, '%Y%m%d') + '.pth'
 BEST_MODEL_SAVE_PATH = para.best_model + datetime.strftime(start, '%Y%m%d') + '.pth'
 
 # init loss
 best_valid_loss = float('inf')
 
 # init data loading
-NP = datasets.dataGroup(para.train_data, para.val_data, para.test_data)
-NP.img_iterator(para.batch_size)
+NP = datasets.dataGroup()
+NP.img_load("train", para.train_data, para.val_data, para.test_data, para.batch_size)
 
 classes = NP.test_data.classes
 
@@ -112,13 +127,25 @@ optimizer = optim.Adam(backbone_model.model.parameters(), lr = float(para.lr), w
 scheduler = lr_scheduler.StepLR(optimizer, step_size = para.lr_decay_step, gamma = para.lr_decay)
 criterion = nn.CrossEntropyLoss()
 print(f'total epoch: {EPOCHS}')
+print(f'batch size: {para.batch_size}')
 print(f'optimizer: {para.optimiser}')
 print(f'init learning rate: {para.lr}')
 print(f'Network: {para.model_name}')
 
 print("!########################################!")
 # training process
-for epoch in range(EPOCHS):
+
+if para.resume == "resume":
+    checkpoint = torch.load(CHECKPOINT_PATH)
+    backbone_model.model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    start_epoch = checkpoint['epoch']
+    best_valid_loss = checkpoint['val_loss']
+    print(f'Resume training from {CHECKPOINT_PATH} epoch {resume_ep}')
+else:
+    print(f'start training')
+
+for epoch in range(start_epoch, EPOCHS):
     train_loss, train_acc = train(backbone_model.model, device, NP.train_iterator, optimizer, criterion)
     valid_loss, valid_acc = evaluate(backbone_model.model, device, NP.valid_iterator, criterion)
 
@@ -130,6 +157,11 @@ for epoch in range(EPOCHS):
         f'| Epoch: {epoch + 1:02} | lr: {optimizer.state_dict()["param_groups"][0]["lr"]} | Train Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:05.2f}% | Val. Loss: {valid_loss:.3f} | Val. Acc: {valid_acc * 100:05.2f}% |')
     # update learning rate
     scheduler.step()
+    torch.save({'epoch': epoch + 1,
+                'model_state_dict': backbone_model.model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'val_loss': best_valid_loss,
+                }, CHECKPOINT_PATH)
 
 end = datetime.now()
 print("!########################################!")
