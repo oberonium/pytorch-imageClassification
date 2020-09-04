@@ -7,6 +7,7 @@
 # Last modified : 09/01/2020 13:36
 # Description   :
 #   V1.1: add save checkpoint; resume training from checkpoint
+#         save whole model
 #   V1.0: define training process
 # ************************************************************#
 
@@ -100,10 +101,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() and para.gpus != "cp
 EPOCHS = para.epochs
 SAVE_DIR = para.records
 CHECKPOINT_PATH = para.checkpoint + datetime.strftime(start, '%Y%m%d') + '.pth'
-BEST_MODEL_SAVE_PATH = para.best_model + datetime.strftime(start, '%Y%m%d') + '.pth'
-
-# init loss
-best_valid_loss = float('inf')
+BEST_MODEL_SAVE_PATH = para.best_model + '_model_' + datetime.strftime(start, '%Y%m%d') + '.pth'
+BEST_MODEL_DICT_SAVE_PATH = para.best_model + '_dict_' + datetime.strftime(start, '%Y%m%d') + '.pth'
 
 # init data loading
 NP = datasets.dataGroup()
@@ -131,7 +130,6 @@ print(f'batch size: {para.batch_size}')
 print(f'optimizer: {para.optimiser}')
 print(f'init learning rate: {para.lr}')
 print(f'Network: {para.model_name}')
-
 print("!########################################!")
 # training process
 
@@ -143,6 +141,8 @@ if para.resume == "resume":
     best_valid_loss = checkpoint['val_loss']
     print(f'Resume training from {CHECKPOINT_PATH} epoch {resume_ep}')
 else:
+    start_epoch = 0
+    best_valid_loss = float('inf')
     print(f'start training')
 
 for epoch in range(start_epoch, EPOCHS):
@@ -151,7 +151,8 @@ for epoch in range(start_epoch, EPOCHS):
 
     if valid_loss < best_valid_loss:
         best_valid_loss = valid_loss
-        torch.save(backbone_model.model.state_dict(), BEST_MODEL_SAVE_PATH)
+        torch.save(backbone_model.model.state_dict(), BEST_MODEL_DICT_SAVE_PATH)
+        torch.save(backbone_model.model, BEST_MODEL_SAVE_PATH)
 
     print(
         f'| Epoch: {epoch + 1:02} | lr: {optimizer.state_dict()["param_groups"][0]["lr"]} | Train Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:05.2f}% | Val. Loss: {valid_loss:.3f} | Val. Acc: {valid_acc * 100:05.2f}% |')
