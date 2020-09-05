@@ -3,13 +3,17 @@
 # Objective     : config file
 # Created by    :
 # Created on    : 08/23/2020
-# Last modified : 08/27/2020 16:11
+# Last modified : 09/05/2020 23:19
 # Description   :
+#   V1.2 add resume parameters
 #   V1.1 parameters for evaluation
 #   V1.0 basic function for training
 #************************************************************#
 ### for evaluation:
 check_model : "./checkpoints/check_model/"
+
+### for training
+resume: "noresume"
 
 ### for training
 # Datasets
@@ -28,7 +32,7 @@ logs : "./logs/"
 epochs : 10
 batch_size : 1
 img_height : 1024
-img_weight : 1024
+img_width : 1024
 num_classes : 2
 seed : 888
 
