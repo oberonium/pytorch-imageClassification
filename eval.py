@@ -79,6 +79,7 @@ print(f'DEVICE: {device}')
 print("initial evaluation...")
 print(f'Number of testing examples: {len(NP.test_data)}')
 print(f'classes: {classes}')
+print(f'image size: {para.img_height} {para.img_width}')
 
 # init model
 backbone_model = default_model.CNNModel(para.num_classes, device)
