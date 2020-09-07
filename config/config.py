@@ -33,7 +33,7 @@ class DefaultConfigs(object):
         self.epochs = 40
         self.batch_size = 4
         self.img_height = 1244
-        self.img_weight = 1024
+        self.img_width = 1024
         self.optimiser = "Adam"
         self.lr = 1e-3
         self.lr_decay = 1e-4
@@ -64,6 +64,8 @@ class DefaultConfigs(object):
             print("evaluation mode")
         # models
         self.model_name = params['model_name']
+        self.img_height = params['img_height']
+        self.img_width = params['img_width']
 
 
 if __name__ == "__main__":
