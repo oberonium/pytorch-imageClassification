@@ -4,8 +4,10 @@
 # Objective     :
 # Created by    :
 # Created on    : 08/27/2020
-# Last modified : 08/31/2020 17:19
+# Last modified : 09/02/2020 10:57
 # Description   :
+#   V1.2 add image size
+#        add specificity; pos acc; neg acc
 #   V1.1 add confusion matrix; F1 score; precision
 #        fixed gpu training model load into gpu/cpu bug
 #   V1.0 basic function
@@ -68,7 +70,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() and para.gpus != "cp
 MODEL_PATH = para.checkmodel
 
 # init data loading
-NP = datasets.dataGroup()
+NP = datasets.dataGroup(imgsize=(int(para.img_height), int(para.img_width)))
 NP.img_load("eval", "", "", para.test_data, para.batch_size)
 
 classes = NP.test_data.classes
@@ -80,28 +82,33 @@ print("initial evaluation...")
 print(f'Number of testing examples: {len(NP.test_data)}')
 print(f'classes: {classes}')
 print(f'image size: {para.img_height} {para.img_width}')
-
 # init model
 backbone_model = default_model.CNNModel(para.num_classes, device)
+#backbone_model.model.avgpool = nn.AdaptiveMaxPool2d(output_size=(1, 1))
 print(f'Network: {para.model_name}')
 
 print("!########################################!")
 for models in os.listdir(MODEL_PATH):
     if models[-4:] == ".pth":
+
         if device == "cpu":
             backbone_model.model.load_state_dict(torch.load(os.path.join(MODEL_PATH, models), map_location = para.gpus))
         else:
             backbone_model.model.load_state_dict(torch.load(os.path.join(MODEL_PATH, models)))
+
         pred_list, true_list = evaluate(backbone_model.model, device, NP.test_iterator)
         cm = confusion_matrix(true_list, pred_list)
         eval_acc = accuracy_score(true_list, pred_list)
+
         if len(classes) == 2:
             p = precision_score(true_list, pred_list, average = 'binary')
             r = recall_score(true_list, pred_list, average = 'binary')
             f1score = f1_score(true_list, pred_list, average = 'binary')
             clas_acc = cm.diagonal() / cm.sum(axis = 1)
+            tn, fp, fn, tp = confusion_matrix(true_list, pred_list).ravel()
+            speci = tn / (tn+fp)
             print(
-                f'test model: {models} |accuracy: {eval_acc * 100:05.2f}% |precision: {p * 100:05.2f}% |recall: {r * 100:05.2f}% |f1: {f1score * 100:05.2f}% |{classes[0]}_acc: {clas_acc[0] * 100:05.2f}% |{classes[1]}_acc: {clas_acc[1] * 100:05.2f}% ')
+                f'test model: {models} |accuracy: {eval_acc * 100:05.2f}% |precision: {p * 100:05.2f}% |specificity: {speci * 100:05.2f}% |recall: {r * 100:05.2f}% |f1: {f1score * 100:05.2f}% |{classes[0]}_acc: {clas_acc[0] * 100:05.2f}% |{classes[1]}_acc: {clas_acc[1] * 100:05.2f}% | tn;tp {tn/(tn+fn) * 100:05.2f}% {tp/(tp+fp) * 100:05.2f}%')
         else:
             print(f'test model: {models} |accuracy: {eval_acc * 100:05.2f}% ')
 
