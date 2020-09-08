@@ -6,6 +6,7 @@
 # Created on    : 08/25/2020
 # Last modified : 09/01/2020 13:36
 # Description   :
+#   V1.2: add img size pre-processing.
 #   V1.1: add save checkpoint; resume training from checkpoint
 #         save whole model
 #   V1.0: define training process
@@ -105,7 +106,7 @@ BEST_MODEL_SAVE_PATH = para.best_model + '_model_' + datetime.strftime(start, '%
 BEST_MODEL_DICT_SAVE_PATH = para.best_model + '_dict_' + datetime.strftime(start, '%Y%m%d') + '.pth'
 
 # init data loading
-NP = datasets.dataGroup()
+NP = datasets.dataGroup(imgsize=(int(para.img_height), int(para.img_width)))
 NP.img_load("train", para.train_data, para.val_data, para.test_data, para.batch_size)
 
 classes = NP.test_data.classes
@@ -130,6 +131,7 @@ print(f'batch size: {para.batch_size}')
 print(f'optimizer: {para.optimiser}')
 print(f'init learning rate: {para.lr}')
 print(f'Network: {para.model_name}')
+print(f'image size: {para.img_height} {para.img_width}')
 print("!########################################!")
 # training process
 
