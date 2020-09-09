@@ -4,7 +4,7 @@
 # Objective     : get configurations for train or inference
 # Created by    :
 # Created on    : 08/20/2020
-# Last modified : 09/01/2020 13:36
+# Last modified : 09/07/2020 11:20
 # Description   :
 #   V1.0 basic function
 # ************************************************************#
