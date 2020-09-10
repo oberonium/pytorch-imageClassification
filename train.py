@@ -6,6 +6,7 @@
 # Created on    : 08/25/2020
 # Last modified : 09/01/2020 13:36
 # Description   :
+#   V1.3: add multiple optim methods
 #   V1.2: add img size pre-processing.
 #   V1.1: add save checkpoint; resume training from checkpoint
 #         save whole model
@@ -16,7 +17,7 @@
 from data import datasets
 from config import config
 from models import default_model
-from utils import logger
+from utils import logger, optimizer
 
 import torch
 import torch.nn as nn
@@ -123,12 +124,12 @@ print(f'classes: {classes}')
 
 # init model
 backbone_model = default_model.CNNModel(para.num_classes, device)
-optimizer = optim.Adam(backbone_model.model.parameters(), lr = float(para.lr), weight_decay = para.lr_weight_decay)
+optimizer = optimizer.init_optimizer(backbone_model.model, para.optimizer, lr = float(para.lr), weight_decay = para.lr_weight_decay)
 scheduler = lr_scheduler.StepLR(optimizer, step_size = para.lr_decay_step, gamma = para.lr_decay)
 criterion = nn.CrossEntropyLoss()
 print(f'total epoch: {EPOCHS}')
 print(f'batch size: {para.batch_size}')
-print(f'optimizer: {para.optimiser}')
+print(f'optimizer: {para.optimizer}')
 print(f'init learning rate: {para.lr}')
 print(f'Network: {para.model_name}')
 print(f'image size: {para.img_height} {para.img_width}')
