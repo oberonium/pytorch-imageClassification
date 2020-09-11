@@ -10,12 +10,12 @@
 
 ### 3. Support functions 
 - [x] pytorch model(from torchvision)
-- [x] optimizer: Adam
+- [x] pytorch pre-defined multiple optimizer: Adam, SGD, Adagrad etc.
+- [x] multiple lr_scheduler: step, multistep, reduce, explr
 
 
 ### 4. TODO
 - [ ] multiple models: pre-trained models、Res2Net、EfficientNet etc.
-- [ ] multiple optimizer: sgd etc.
-- [ ] multiple lr_scheduler
+- [ ] multiple lr_scheduler: coslr, warmup etc.
 - [ ] fp16
 - [ ] Learning rate scheduler
